@@ -12,6 +12,7 @@ Future<File> getVideoFile(String path, {String? id}) async {
       return File(path);
     }
   }
+
   if (Platform.isIOS) {
     final directory = (await getLibraryDirectory()).path;
     if (id != null) {

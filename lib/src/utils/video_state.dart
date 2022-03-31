@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:neon_downloader/src/domain/entitys/config_entity.dart';
 import 'package:neon_downloader/src/domain/entitys/video_entity.dart';
 import 'package:neon_downloader/src/data/get_video_file.dart';
@@ -19,7 +21,7 @@ Future<void> setupConfig({Duration? duration}) async {
 
   _configEntity = ConfigEntity(duration: duration ?? const Duration(days: 30));
 
-  await _prefs.setString(_confgId, _configEntity.toJson().toString());
+  await _prefs.setString(_confgId, jsonEncode(_configEntity.toJson()));
 }
 
 class VideoState {
@@ -55,7 +57,7 @@ class VideoState {
         lastPosition: const Duration(seconds: 0),
       );
 
-      await _prefs.setString(id, _videoObj.toJson().toString());
+      await _prefs.setString(id, jsonEncode(_videoObj.toJson()));
 
       if (items != null) {
         items.add(id);
@@ -82,7 +84,7 @@ class VideoState {
     void Function(int, int)? onProgress,
 
     // date when the video should be deleted
-    Duration? deletTime,
+    DateTime? deletTime,
 
     // img url - for thumpmail
     String? imgUrl,
@@ -111,10 +113,11 @@ class VideoState {
         imgUrl: imgUrl,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
-        deleteAt: DateTime.now().add(_configEntity.duration),
+        deleteAt: deletTime ?? DateTime.now().add(_configEntity.duration),
         lastPosition: const Duration(seconds: 0),
       );
-      await _prefs.setString(id, _videoObj.toJson().toString());
+
+      await _prefs.setString(id, jsonEncode(_videoObj.toJson()));
 
       videoDownloader(id, videoUrl, onProgress);
     }
@@ -170,7 +173,7 @@ class VideoState {
       _videoObj = VideoEntity.fromJson(_videoId);
       _videoObj =
           _videoObj.copyWith(updatedAt: DateTime.now(), lastPosition: duration);
-      await _prefs.setString(id, _videoObj.toJson().toString());
+      await _prefs.setString(id, jsonEncode(_videoObj.toJson()));
     }
   }
 
@@ -184,7 +187,7 @@ class VideoState {
     if (_videoId != null) {
       _videoObj = VideoEntity.fromJson(_videoId);
       _videoObj = _videoObj.copyWith(deleteAt: date);
-      await _prefs.setString(id, _videoObj.toJson().toString());
+      await _prefs.setString(id, jsonEncode(_videoObj.toJson()));
     }
   }
 
@@ -199,7 +202,7 @@ class VideoState {
       if (_videoId != null) {
         _videoObj = VideoEntity.fromJson(_videoId);
         _videoObj = _videoObj.copyWith(deleteAt: date);
-        await _prefs.setString(id, _videoObj.toJson().toString());
+        await _prefs.setString(id, jsonEncode(_videoObj.toJson()));
       }
     }
   }
@@ -217,13 +220,15 @@ class VideoState {
       if (_videoId != null) {
         _videoObj = VideoEntity.fromJson(_videoId);
 
-        if ((await getVideoFile(_videoObj.vidioPath!)).existsSync()) {
-          (await getVideoFile(_videoObj.vidioPath!)).deleteSync();
-
-          items.remove(id);
-          await _prefs.setStringList(_offlineVideoId, items);
-          await _prefs.remove(id);
+        if (_videoObj.vidioPath != null) {
+          if ((await getVideoFile(_videoObj.vidioPath!)).existsSync()) {
+            (await getVideoFile(_videoObj.vidioPath!)).deleteSync();
+          }
         }
+
+        items.remove(id);
+        await _prefs.setStringList(_offlineVideoId, items);
+        await _prefs.remove(id);
       }
     }
   }
@@ -239,13 +244,16 @@ class VideoState {
       String? _videoId = _prefs.getString(id);
       if (items != null && _videoId != null) {
         _videoObj = VideoEntity.fromJson(_videoId);
-        if ((await getVideoFile(_videoObj.vidioPath!)).existsSync()) {
-          (await getVideoFile(_videoObj.vidioPath!)).deleteSync();
 
-          items.remove(id);
-          await _prefs.setStringList(_offlineVideoId, items);
-          await _prefs.remove(id);
+        if (_videoObj.vidioPath != null) {
+          if ((await getVideoFile(_videoObj.vidioPath!)).existsSync()) {
+            (await getVideoFile(_videoObj.vidioPath!)).deleteSync();
+          }
         }
+
+        items.remove(id);
+        await _prefs.setStringList(_offlineVideoId, items);
+        await _prefs.remove(id);
       }
     }
   }
@@ -265,13 +273,15 @@ class VideoState {
         if (_videoId != null) {
           _videoObj = VideoEntity.fromJson(_videoId);
 
-          if ((await getVideoFile(_videoObj.vidioPath!)).existsSync()) {
-            (await getVideoFile(_videoObj.vidioPath!)).deleteSync();
-
-            items.remove(i);
-            await _prefs.remove(_offlineVideoId);
-            await _prefs.remove(i);
+          if (_videoObj.vidioPath != null) {
+            if ((await getVideoFile(_videoObj.vidioPath!)).existsSync()) {
+              (await getVideoFile(_videoObj.vidioPath!)).deleteSync();
+            }
           }
+
+          items.remove(i);
+          await _prefs.remove(_offlineVideoId);
+          await _prefs.remove(i);
         }
       }
     }

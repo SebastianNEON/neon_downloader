@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'dart:convert';
 
 class ConfigEntity extends Equatable {
   final Duration duration;
@@ -17,10 +18,11 @@ class ConfigEntity extends Equatable {
     return map;
   }
 
-  factory ConfigEntity.fromJson(dynamic json) {
+  factory ConfigEntity.fromJson(dynamic data) {
+    dynamic json = jsonDecode(data);
     return ConfigEntity(
-      duration: Duration(days: json['id']),
-      token: json['token'],
+      duration: Duration(days: json['duration'] as int),
+      token: json['token'] as String,
     );
   }
 

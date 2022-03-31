@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'dart:convert';
 
 class VideoEntity extends Equatable {
   final String? id;
@@ -9,7 +10,7 @@ class VideoEntity extends Equatable {
   final DateTime? updatedAt;
   final DateTime? createdAt;
   final DateTime? deleteAt;
-  final Duration? lastPosition;
+  final Duration lastPosition;
 
   const VideoEntity({
     this.id,
@@ -20,7 +21,7 @@ class VideoEntity extends Equatable {
     this.updatedAt,
     this.createdAt,
     this.deleteAt,
-    this.lastPosition,
+    this.lastPosition = const Duration(seconds: 0),
   });
 
   Map<String, dynamic> toJson() {
@@ -30,25 +31,26 @@ class VideoEntity extends Equatable {
     map['vidioPath'] = vidioPath;
     map['imgUrl'] = imgUrl;
     map['imgPath'] = imgPath;
-    map['updatedAt'] = updatedAt;
-    map['createdAt'] = createdAt;
-    map['deleteAt'] = deleteAt;
-    map['lastPosition'] = lastPosition;
+    map['updatedAt'] = updatedAt.toString();
+    map['createdAt'] = createdAt.toString();
+    map['deleteAt'] = deleteAt.toString();
+    map['lastPosition'] = lastPosition.inSeconds.toString();
 
     return map;
   }
 
-  factory VideoEntity.fromJson(dynamic json) {
+  factory VideoEntity.fromJson(dynamic data) {
+    dynamic json = jsonDecode(data);
     return VideoEntity(
-      id: json['id'],
+      id: json['id'] as String,
       videoUrl: json['videoUrl'],
       vidioPath: json['vidioPath'],
       imgUrl: json['imgUrl'],
       imgPath: json['imgPath'],
-      updatedAt: json['updatedAt'],
-      createdAt: json['createdAt'],
-      deleteAt: json['deleteAt'],
-      lastPosition: json['lastPosition'],
+      updatedAt: DateTime.parse(json['updatedAt']),
+      createdAt: DateTime.parse(json['createdAt']),
+      deleteAt: DateTime.parse(json['deleteAt']),
+      lastPosition: Duration(seconds: int.parse(json['lastPosition'])),
     );
   }
 
@@ -66,7 +68,7 @@ class VideoEntity extends Equatable {
     return VideoEntity(
       id: id ?? this.id,
       videoUrl: videoUrl ?? this.videoUrl,
-      vidioPath: vidioPath ?? this.videoUrl,
+      vidioPath: vidioPath ?? this.vidioPath,
       imgUrl: imgUrl ?? this.imgUrl,
       imgPath: imgPath ?? this.imgPath,
       updatedAt: updatedAt ?? this.updatedAt,
