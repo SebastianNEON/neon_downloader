@@ -1,0 +1,38 @@
+name: neon_downloader
+description: A new Flutter package project.
+version: 0.0.1
+
+publish_to: none
+
+environment:
+  sdk: ">=2.16.1 <3.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  http: ^0.13.4
+  dio: ^4.0.4
+  shared_preferences: ^2.0.13
+  path_provider: ^2.0.9
+  path: ^1.8.0
+  equatable: ^2.0.3
+
+  # state
+  bloc: ^8.0.3
+  flutter_bloc: ^8.0.1
+
+  freezed_annotation: 0.15.0
+  json_annotation: 4.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^1.0.0
+  build_runner: 2.1.5
+  freezed: 0.15.1+1
+  json_serializable: 6.1.4
+
+flutter:
+
